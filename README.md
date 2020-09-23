@@ -24,7 +24,7 @@ yarn lint
 npm run lint
 ```
 
-### Деплой на github pages (Внимание! Поменяйти данные на свои в ././deploy и ./vie.config)
+### Деплой на github pages (Внимание! Поменяйти данные на свои в ./deploy и ./vie.config)
 ```
 yarn deploy
 npm run deploy
