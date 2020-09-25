@@ -22,13 +22,13 @@
       <div class="n-chat-actions">
         <textarea
           name=""
-          id=""
-          min-height="100"
           ref="textarea"
-          rows="1"
+          placeholder="Сообщение"
           v-model="message"
         ></textarea>
-        <button type="button" @click="onSendClick">Добавить</button>
+        <button type="button" @click="onSendMessageClick" :disabled="!message">
+          Добавить
+        </button>
       </div>
     </div>
   </div>
@@ -43,13 +43,14 @@ export default {
     history: [],
     personName: "",
     scrollHeight: null,
+    dataTimeout: null,
     message: ""
   }),
   computed: {
     ...mapGetters(["getHistory", "getError"])
   },
   methods: {
-    onSendClick() {
+    onSendMessageClick() {
       let data = {
         name: "me",
         sender: {
@@ -57,28 +58,45 @@ export default {
         },
         text: this.message,
         right: true,
-        room: this.history[0].room,
+        room: this.$route.query.name,
         created: new Date().toLocaleTimeString()
       };
 
-      this.history.push(data);
       this.$store.dispatch("updateHistory", data);
 
       this.scrollDown();
       this.message = "";
+      this.addCount++;
+      this.history = this.getHistory;
     },
     scrollDown() {
-      setTimeout(() => {
+      return setTimeout(() => {
         this.$refs.list.scrollTop = this.$refs.list.scrollHeight;
       });
     }
   },
   async mounted() {
-    await this.$store.dispatch("fetchHistory", this.$route.query.name);
+    try {
+      await this.$store.dispatch("fetchHistory", this.$route.query.name);
 
-    this.history = this.getHistory;
-    this.personName = this.history[0].sender.username;
+      this.dataTimeout = setTimeout(() => {
+        this.history = this.getHistory;
+      });
+    } catch (error) {
+      this.history = [];
+    }
+
+    if (this.history.length) {
+      this.personName = this.history[0].sender.username;
+    } else {
+      this.personName = this.$route.query.name;
+    }
+
     this.scrollDown();
+  },
+  destroyed() {
+    this.dataTimeout = null;
+    this.scrollDown = null;
   }
 };
 </script>

@@ -25,8 +25,6 @@ export default {
       return this.title;
     }
   },
-  mounted() {
-    console.log("App mounted");
-  }
+  mounted() {}
 };
 </script>

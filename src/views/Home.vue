@@ -2,17 +2,15 @@
   <div class="n-container n-home">
     <form class="n-form" @submit.prevent="onSubmit">
       <label>
-        <p class="n-field-title">Name</p>
+        <p class="n-field-title">Имя</p>
         <input type="text" name="name" v-model="name" placeholder="Ваше имя" />
         <span class="n-error" v-if="!$v.name.required"
           >Поле обязательно для заполнения</span
         >
-        <span class="n-error" v-if="!$v.name.maxLength"
-          >Меньше {{ $v.name.$params.maxLength.max }} букв</span
-        >
+        <span class="n-error" v-else-if="!$v.name.maxLength">Меньше букв</span>
       </label>
-      <label>
-        <p class="n-field-title">Password</p>
+      <!-- <label>
+        <p class="n-field-title">Пароль</p>
         <input
           type="text"
           name="password"
@@ -25,32 +23,43 @@
         <span class="n-error" v-if="!$v.password.minLength"
           >Больше {{ $v.password.$params.minLength.max }} букв</span
         >
-      </label>
-      <button type="submit" :disabled="$v.$invalid">Войти</button>
-      <button type="button" @click="resetForm">Отмена</button>
+      </label> -->
+      <button type="submit" :disabled="$v.$invalid">Войти в комнату</button>
+      <button type="button" @click="resetForm">Очистить поле</button>
     </form>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import { required, maxLength, minLength } from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
 
 export default {
   name: "Home",
   data: () => ({
     name: "kozma",
-    password: "123456"
+    settings: 20,
+    lengthTimeout: null
+    //, password: "123456"
   }),
   validations: {
     name: {
       required,
-      maxLength: maxLength(50 || this.getSettings.max_username_length)
-    },
-    password: {
-      required,
-      minLength: minLength(6)
+      async maxLength(val) {
+        if (val === "") {
+          return val;
+        }
+
+        await this.$store.dispatch("fetchSettings");
+
+        return await this.getSettings.max_username_length;
+      }
+      // maxLength: maxLength(this.max_username_length)
     }
+    //, password: {
+    //   required,
+    //   minLength: minLength(6)
+    // }
   },
   computed: {
     ...mapGetters(["getSettings"])
@@ -66,11 +75,12 @@ export default {
     },
     resetForm() {
       this.name = "";
-      this.password = "";
+      // this.password = "";
     }
   },
-  async mounted() {
-    this.settings = await this.$store.dispatch("fetchSettings");
+  mounted() {},
+  destroyed() {
+    this.lengthTimeout = null;
   }
 };
 </script>

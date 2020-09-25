@@ -31,20 +31,17 @@ export default {
       }
     },
     async fetchHistory({ commit }, name) {
-      try {
-        let promise = await fetch(`https://nane.tada.team/api/rooms/${name}/history`);
-        let res = await promise.json();
+      let promise = await fetch(`https://nane.tada.team/api/rooms/${name}/history`);
+      let res = await promise.json();
 
-        if (Array.isArray(res.result)) {
-          commit("addHistory", res.result);
-        } else {
-          console.error(`Error: ${name} не массив`);
-        }
-        commit("setError", "");
-      } catch (e) {
-        commit("setError", "Нет историй или нет такого юзера");
-        throw new Error(`Что-то пошло не так`, e);
+      if (!res) {
+        commit("addHistory", []);
       }
+
+      if (Array.isArray(res.result)) {
+        commit("addHistory", res.result);
+      }
+      commit("setError", "");
     },
     updateHistory({ commit }, obj) {
       commit("updateHistory", obj);
