@@ -8,13 +8,13 @@
           <li
             v-for="mes in history"
             :key="mes.created"
-            :class="['n-message', { right: mes.right }]"
+            :class="['n-message', { 'n-right': mes.right }]"
           >
             <span class="n-message__text">
               {{ mes.text }}
             </span>
             <span class="n-message__user">
-              {{ mes.sender.username }}: {{ mes.room }}
+              {{ mes.sender.username }}: <i>{{ mes.room }}</i>
             </span>
           </li>
         </ul>
@@ -43,7 +43,9 @@ export default {
     history: [],
     personName: "",
     scrollHeight: null,
-    dataTimeout: null,
+    timers: {
+      scrollDownTimeout: null
+    },
     message: ""
   }),
   computed: {
@@ -64,39 +66,31 @@ export default {
 
       this.$store.dispatch("updateHistory", data);
 
-      this.scrollDown();
       this.message = "";
-      this.addCount++;
       this.history = this.getHistory;
-    },
-    scrollDown() {
-      return setTimeout(() => {
+      this.timers.scrollDownTimeout = setTimeout(() => {
         this.$refs.list.scrollTop = this.$refs.list.scrollHeight;
-      });
+      }, 1);
     }
   },
   async mounted() {
-    try {
-      await this.$store.dispatch("fetchHistory", this.$route.query.name);
+    await this.$store.dispatch("fetchHistory", this.$route.query.name);
 
-      this.dataTimeout = setTimeout(() => {
-        this.history = this.getHistory;
-      });
-    } catch (error) {
-      this.history = [];
-    }
+    this.history = this.getHistory;
 
-    if (this.history.length) {
+    if (this.history.length && typeof this.history[0] === "object") {
       this.personName = this.history[0].sender.username;
     } else {
       this.personName = this.$route.query.name;
     }
 
-    this.scrollDown();
+    this.timers.scrollDownTimeout = setTimeout(() => {
+      this.$refs.list.scrollTop = this.$refs.list.scrollHeight;
+    }, 1);
   },
   destroyed() {
-    this.dataTimeout = null;
-    this.scrollDown = null;
+    clearTimeout(this.timers.scrollDownTimeout);
+    this.timers.scrollDownTimeout = null;
   }
 };
 </script>

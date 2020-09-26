@@ -20,10 +20,7 @@ a {
   text-decoration: none;
   color: inherit;
 
-  &:active {
-    text-decoration: underline;
-  }
-
+  &:active,
   &:hover {
     text-decoration: underline;
   }
@@ -36,7 +33,8 @@ button {
     opacity: .8;
   }
 
-  &:disabled {
+  &:disabled,
+  &:active:disabled {
     opacity: .5;
   }
 
@@ -44,8 +42,6 @@ button {
     opacity: .3;
   }
 }
-
-// #app {}
 
 .n-header {
   display: flex;
@@ -159,14 +155,6 @@ button {
   overflow-y: auto;
 }
 
-.right {
-  align-self: flex-end;
-
-  & .n-message__text {
-    background: $mainColorGrad;
-  }
-}
-
 .n-message {
   margin: 10px;
   max-width: 50%;
@@ -174,7 +162,7 @@ button {
 }
 
 .n-message__text {
-  padding: 15px;
+  padding: 10px 15px;
   display: block;
   border-radius: $brs;
   background: $customerGrad;
@@ -183,7 +171,19 @@ button {
 
 .n-message__user {
   display: block;
+  padding-top: 5px;
   font-size: .8em;
+}
+
+.n-right {
+  align-self: flex-end;
+
+  & .n-message__text {
+    background: $mainColorGrad;
+  }
+  & .n-message__user {
+    text-align: right;
+  }
 }
 
 .n-chat-actions {

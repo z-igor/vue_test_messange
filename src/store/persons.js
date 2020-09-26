@@ -25,27 +25,32 @@ export default {
         let res = await promise.json();
 
         commit("addSettings", res.result);
-        commit("setError", "");
+        // commit("setError", "");
       } catch (e) {
         throw new Error(`Что-то пошло не так`);
       }
     },
     async fetchHistory({ commit }, name) {
-      let promise = await fetch(`https://nane.tada.team/api/rooms/${name}/history`);
-      let res = await promise.json();
+      let fetchData = null;
+      let res = null;
 
-      if (!res) {
-        commit("addHistory", []);
-      }
+      try {
+        fetchData = await fetch(`https://nane.tada.team/api/rooms/${name}/history`);
+        res = await fetchData.json();
 
-      if (Array.isArray(res.result)) {
-        commit("addHistory", res.result);
+        if (Array.isArray(res.result)) {
+          commit("addHistory", res.result);
+        }
+      } catch (error) {
+        if (!fetchData) {
+          commit("addHistory", []);
+        }
       }
-      commit("setError", "");
+      // commit("setError", "");
     },
     updateHistory({ commit }, obj) {
       commit("updateHistory", obj);
-      commit("setError", "");
+      // commit("setError", "");
     }
   },
   getters: {

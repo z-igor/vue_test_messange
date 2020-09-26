@@ -7,7 +7,9 @@
         <span class="n-error" v-if="!$v.name.required"
           >Поле обязательно для заполнения</span
         >
-        <span class="n-error" v-else-if="!$v.name.maxLength">Меньше букв</span>
+        <span class="n-error" v-else-if="!$v.name.maxLength"
+          >Вы превысили {{ getSettings.max_username_length }} символов</span
+        >
       </label>
       <!-- <label>
         <p class="n-field-title">Пароль</p>
@@ -37,7 +39,7 @@ import { required } from "vuelidate/lib/validators";
 export default {
   name: "Home",
   data: () => ({
-    name: "kozma",
+    name: "kozmaa",
     settings: 20,
     lengthTimeout: null
     //, password: "123456"
@@ -46,15 +48,15 @@ export default {
     name: {
       required,
       async maxLength(val) {
+        const max = await this.getSettings.max_username_length;
+        const length = val.length;
+
         if (val === "") {
           return val;
         }
 
-        await this.$store.dispatch("fetchSettings");
-
-        return await this.getSettings.max_username_length;
+        return length <= max;
       }
-      // maxLength: maxLength(this.max_username_length)
     }
     //, password: {
     //   required,
@@ -78,7 +80,9 @@ export default {
       // this.password = "";
     }
   },
-  mounted() {},
+  mounted() {
+    this.$store.dispatch("fetchSettings");
+  },
   destroyed() {
     this.lengthTimeout = null;
   }
